@@ -236,15 +236,17 @@
  	 * @param ZbRequest requête au format Zibase
  	 * @return ZbResponse réponse de la zibase
  	 */
- 	private function sendRequest($request) { 	
+ 	private function sendRequest($request, $withResponse = true) { 	
  		$buffer = $request->toBinaryArray();
  		$socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
  		$ack = "";
  		$response = null;
  		socket_sendto($socket, $buffer, strlen($buffer), 0, $this->ip, $this->port);
- 		socket_recvfrom($socket, $ack, 512, 0, $this->ip, $this->port);
- 		if (strlen($ack) > 0) { 	
- 			$response = new ZbResponse($ack);
+ 		if ($withResponse) {
+ 			socket_recvfrom($socket, $ack, 512, 0, $this->ip, $this->port);
+ 			if (strlen($ack) > 0) { 	
+ 				$response = new ZbResponse($ack);
+ 			}
  		}	
  		socket_close($socket);
  		return $response;
@@ -442,7 +444,7 @@
 			$request = new ZbRequest();
 			$request->command = 16;		  
 			$request->message = "cmd: ".$script;
-		    $this->sendRequest($request);
+		    $this->sendRequest($request, false);
 		}	
  	}
  	
