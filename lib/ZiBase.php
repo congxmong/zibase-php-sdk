@@ -2,10 +2,11 @@
 /*
  * Librairie PHP ZiBase
  * Permet de contrôler la zibase depuis un site PHP
- * Compatible avec la ZAPI 1.9 ZODIANET
+ * Compatible avec la ZAPI 1.3 ZODIANET
  * Auteur : Benjamin GAREL
  * Juin 2011
- * @version 1.9.1
+ * Màj Nov. 2012 - Nicolas Wälti
+ * @version 1.9.2
  * @package ZiBase
  */
  
@@ -296,6 +297,36 @@
 	  $request->param2 = $numScenario;
       $this->sendRequest($request);	
  	}
+	
+ 	/**
+ 	 * Enregistre une machine en tant qu'écouteur
+ 	 * @param string $ip l'adresse IP de l'écouteur
+	 * @param int $port le port sur lequel écouter, par défaut 49999
+ 	 */	
+	public function registerListener($ip,$port=49999) {
+ 		$request = new ZbRequest();
+		$request->command = 13;
+		$request->param1 = ip2long($ip);
+		$request->param2 = $port;
+		$request->param3 = 0;
+		$request->param4 = 0;
+    	$this->sendRequest($request,false);
+ 	}
+	
+ 	/**
+ 	 * Désenregistre une machine en tant qu'écouteur
+ 	 * @param string $ip l'adresse IP de l'écouteur
+	 * @param int $port le port sur lequel écouter, par défaut 49999
+ 	 */	
+	public function deregisterListener($ip,$port=49999) {
+ 		$request = new ZbRequest();
+		$request->command = 22;
+		$request->param1 = ip2long($ip);
+		$request->param2 = $port;
+		$request->param3 = 0;
+		$request->param4 = 0;
+    	$this->sendRequest($request,false);
+ 	}	
  	
  	/**
  	 * Récupère la valeur d'une variable Vx de la Zibase
