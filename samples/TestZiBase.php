@@ -136,5 +136,18 @@
 ?>
 
 
+<?php
+ # Récupération en temps réel des messages reçus par la ZiBase
+ $zibase->registerListener('192.168.1.12');
+ $socket = socket_create(AF_INET, SOCK_DGRAM, 0);
+ socket_bind($socket, "0.0.0.0" , 49999);
+ while (true) {
+	socket_recvfrom($socket, $data, 512, 0, $remote_ip, $remote_port);
+	$zbData = new ZbResponse($data);
+	echo "Nouveau message reçu: ".$zbData->message;
+ }
+?>
+
+
 </body>
 </html>
