@@ -2,11 +2,11 @@
 /*
  * Librairie PHP ZiBase
  * Permet de contrôler la zibase depuis un site PHP
- * Compatible avec la ZAPI 1.3 ZODIANET
+ * Compatible avec la ZAPI 1.13 ZODIANET
  * Auteur : Benjamin GAREL
  * Juin 2011
  * Màj Nov. 2012 - Nicolas Wälti
- * @version 1.9.2
+ * @version 1.9.3
  * @package ZiBase
  */
  
@@ -369,9 +369,10 @@
  	 * La zibase ne recoit que les ordres RF et non les ordres CPL X10,
  	 * donc l'état d'un actionneur X10 connu par la zibase peut être erronné.
  	 * @param string adresse au format X10 de l'actionneur
+	 * @param boolean indique si c'est un actionneur ZWave (car le message envoyé à la zibase est différent)
  	 * @return int l'état : 0=OFF, 1=ON
  	 */
- 	public function getState($address) {
+ 	public function getState($address, $isZWave = false) {
  		if (strlen($address) > 1) { 		
 	 		$address = strtoupper($address);
 	 		$request = new ZbRequest();
@@ -383,6 +384,10 @@
 			$device = intval(substr($address, 1)) - 1;
 		    $request->param4 = $device;
 		    $request->param4 |= ($houseCode & 0x0F) << 0x04;		
+			
+			// Pour le zwave, il faut mettre le 9e bit à 1
+			if ($isZWave)
+				$request->param4 |= 0x0100;
 			
 	    	$response = $this->sendRequest($request);
 	 		if ($response != null)
