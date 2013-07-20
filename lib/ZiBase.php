@@ -6,7 +6,7 @@
  * Auteur : Benjamin GAREL
  * Juin 2011
  * Màj Nov. 2012 - Nicolas Wälti
- * @version 1.9.3
+ * @version 1.9.4
  * @package ZiBase
  */
  
@@ -457,7 +457,8 @@
  			date_default_timezone_set($this->timeZone);
  			$dateSensor = new DateTime();
  			$attributes = $node[0]->attributes();
- 			//date_timestamp_set($dateSensor, intval($attributes["gmt"]));
+ 			//BUGFIX MISTERQUELLEGOULE
+			$dateSensor->setDate(date("Y", intval($attributes["gmt"])), date("n", intval($attributes["gmt"])), date("j", intval($attributes["gmt"])));			
  			$dateSensor->setTime(date("H", intval($attributes["gmt"])), date("i", intval($attributes["gmt"])), date("s", intval($attributes["gmt"])));
  			$info[0] = $dateSensor;
  			$info[1] = intval($attributes["v1"]);
@@ -527,7 +528,8 @@
  			date_default_timezone_set($this->timeZone);
  			$dateSensor = new DateTime();
  			$attributes = $node[0]->attributes();
- 			//date_timestamp_set($dateSensor, intval($attributes["gmt"]));
+ 			//BUGFIX MISTERQUELLEGOULE
+			$dateSensor->setDate(date("Y", intval($attributes["gmt"])), date("n", intval($attributes["gmt"])), date("j", intval($attributes["gmt"])));			
  			$dateSensor->setTime(date("H", intval($attributes["gmt"])), date("i", intval($attributes["gmt"])), date("s", intval($attributes["gmt"]))); 						
  			return $dateSensor;
  		}
@@ -559,7 +561,8 @@
  			date_default_timezone_set($this->timeZone);
  			$dateSensor = new DateTime();
  			$attributes = $node[0]->attributes();
- 			//date_timestamp_set($dateSensor, intval($attributes["gmt"]));
+ 			//BUGFIX MISTERQUELLEGOULE
+			$dateSensor->setDate(date("Y", intval($attributes["gmt"])), date("n", intval($attributes["gmt"])), date("j", intval($attributes["gmt"])));			
  			$dateSensor->setTime(date("H", intval($attributes["gmt"])), date("i", intval($attributes["gmt"])), date("s", intval($attributes["gmt"])));
  			$info[0] = $dateSensor;
  			$info[1] = intval($attributes["v1"]);
