@@ -6,7 +6,8 @@
  * Auteur : Benjamin GAREL
  * Juin 2011
  * Màj Nov. 2012 - Nicolas Wälti
- * @version 1.9.4
+ * Maj Aout 2013 - 
+ * @version 1.9.5
  * @package ZiBase
  */
  
@@ -440,7 +441,7 @@
  	 * Pour les capteurs X10 : Utiliser la méthode getX10SensorInfo()
  	 * Ex: pour le MS18 : $idSensor = XS15425145 pour triggered et = XS15425144 pour reset
  	 * @param string Identifiant de la sonde
- 	 * @return array de la forme [0 => date du relevé (de type DateTime), 1 => V1, 2 => V2] 
+ 	 * @return array de la forme [0 => date du relevé (de type DateTime), 1 => V1, 2 => V2, 3 => batterie faible] 
  	 */
  	public function getSensorInfo($idSensor) {
  		$url = "http://" . $this->ip . "/sensors.xml";
@@ -462,7 +463,8 @@
  			$dateSensor->setTime(date("H", intval($attributes["gmt"])), date("i", intval($attributes["gmt"])), date("s", intval($attributes["gmt"])));
  			$info[0] = $dateSensor;
  			$info[1] = intval($attributes["v1"]);
- 			$info[2] = intval($attributes["v2"]); 			
+ 			$info[2] = intval($attributes["v2"]);
+			$info[3] = intval($attributes["lowbatt"]); 			
  			return $info;
  		}
  		else
@@ -545,7 +547,7 @@
  	 * @param string URL de la page internet où se trouve les infos
  	 * Ex: http://zibase.net/m/get_xml_sensors.php?device=ZiBASExxx&token=yyyyyyyy
  	 * @param string Identifiant de la sonde
- 	 * @return array de la forme [0 => date du relevé (de type DateTime), 1 => V1, 2 => V2] 
+ 	 * @return array de la forme [0 => date du relevé (de type DateTime), 1 => V1, 2 => V2, 3 => batterie faible] 
  	 */
  	public function getSensorInfoFromInternet($url, $idSensor) { 		
  		$handle = fopen($url, "rb");
@@ -566,13 +568,38 @@
  			$dateSensor->setTime(date("H", intval($attributes["gmt"])), date("i", intval($attributes["gmt"])), date("s", intval($attributes["gmt"])));
  			$info[0] = $dateSensor;
  			$info[1] = intval($attributes["v1"]);
- 			$info[2] = intval($attributes["v2"]); 			
+ 			$info[2] = intval($attributes["v2"]);
+			$info[3] = intval($attributes["lowbatt"]); 			
  			return $info;
  		}
  		else
  			return null; 		
  	} 	
  	
+	/**
+	* fonction permettant de recuperer la liste des peripheriques de la zibase
+	* depuis internet
+	*/
+	public function getSensorListFromInternet($idZibase, $tokenZibase) {
+		$url = "http://zibase.net/m/get_xml.php?device=".$idZibase."&token=".$tokenZibase;
+		$handle = fopen($url, "rb");
+		$xmlContent = stream_get_contents($handle);
+		fclose($handle);
+		$i = 0;
+		$xmlDoc = simplexml_load_string($xmlContent);
+		$node = $xmlDoc->xpath('//e');
+		foreach ($node as $ua) {
+			$attributes = $ua[0]->attributes();
+			$info[$i]['c'] = $attributes["c"];
+			$info[$i]['n'] = $ua->n;
+			$info[$i]['t'] = $attributes["t"];
+			$info[$i]['i'] = $attributes["i"];
+			$i = $i + 1;
+		}
+		return $info;
+	}
+	
+	
  }
  
 ?>
