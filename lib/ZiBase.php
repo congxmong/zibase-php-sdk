@@ -450,7 +450,14 @@
  		fclose($handle);
  		
  		$type = substr($idSensor, 0, 2);
- 		$number = substr($idSensor, 2);
+      // BUGFix pour prendre en compte les sondes ZWave comme les modules Fibaro Wall plug par Cmoi20
+     if(preg_match('#^[A-Z]#',substr($idSensor, 2, 1))){
+     $lettre = array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
+     $chiffre   = array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26");
+     $number = str_replace($lettre, $chiffre, substr($idSensor, 2, 1)) * 16 + substr($idSensor, 3) -1;
+     } else {
+     $number = substr($dSensor, 2);
+     } 
  		$xmlDoc = simplexml_load_string($xmlContent);
  		$node = $xmlDoc->xpath("//ev[@id='".$number."' and @pro='".$type."']"); 		
  		if ($node != null && $node[0]) { 			
@@ -555,7 +562,14 @@
  		fclose($handle);
  		
  		$type = substr($idSensor, 0, 2);
- 		$number = substr($idSensor, 2); 		
+      // BUGFix pour prendre en compte les sondes ZWave comme les modules Fibaro Wall plug par Cmoi20
+     if(preg_match('#^[A-Z]#',substr($idSensor, 2, 1))){
+     $lettre = array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
+     $chiffre   = array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26");
+     $number = str_replace($lettre, $chiffre, substr($idSensor, 2, 1)) * 16 + substr($idSensor, 3) -1;
+     } else {
+     $number = substr($dSensor, 2);
+     }		
  		$xmlDoc = simplexml_load_string($xmlContent);
  		$node = $xmlDoc->xpath("//ev[@id='".$number."']"); 		
  		if ($node != null && $node[0]) { 			
@@ -578,7 +592,7 @@
  	
 	/**
 	* fonction permettant de recuperer la liste des peripheriques de la zibase
-	* depuis internet
+	* depuis internet par Cmoi20
 	*/
 	public function getSensorListFromInternet($idZibase, $tokenZibase) {
 		$url = "http://zibase.net/m/get_xml.php?device=".$idZibase."&token=".$tokenZibase;
@@ -598,7 +612,40 @@
 		}
 		return $info;
 	}
-	
+
+
+  /**
+  * fonction permettant de recuperer la liste des thermostats 
+  * depuis internet par Cmoi20
+  */
+  public function getThermostat($idprincipalzibase,$tokenzibase) {
+    $info = array();
+    $url = "http://zibase.net/m/get_xml.php?device=".$idprincipalzibase."&token=".$tokenzibase;
+    $handle = fopen($url, "rb");
+    $xmlContent = stream_get_contents($handle);
+    fclose($handle);
+    $i = 0;
+    $xmlDoc = simplexml_load_string($xmlContent);
+       for ($i = 1; $i <= 16; $i++) {
+          $node = $xmlDoc->xpath('//thermostat'.$i);
+             if($node != null) {
+                $val = explode(":", $node[0]["data"]);
+                $info[$i]['0'] = $val['0'];
+                $info[$i]['1'] = $val['1'];
+                $info[$i]['2'] = $val['2'];
+                $info[$i]['3'] = $val['3'];
+                $info[$i]['4'] = $val['4'];
+                $info[$i]['5'] = $val['5'];
+                $info[$i]['6'] = $val['6'];
+                $info[$i]['7'] = $val['7'];
+                $info[$i]['8'] = $val['8'];
+                $info[$i]['9'] = $val['9'];
+                $info[$i]['10'] = $val['10'];
+                $info[$i]['11'] = $val['11'];
+             }
+          }
+       return $info;
+    }
 	
  }
  
