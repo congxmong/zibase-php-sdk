@@ -507,9 +507,8 @@
 		$request->command = 11;		  
 		$request->param1 = 6;
 		$request->param2 = $idProbe;
-		$request->param3 = $value1;
-		$request->param3 |= ($value2 & 0xFF) << 0x10;
-		$request->param3 |= ($lowBattery & 0xFF) << 0x1A;
+      // BUGFIX par lfontana
+    $request->param3 = bindec("0000".$lowBattery."00".substr("00000000".decbin($value2),-8).substr("0000000000000000".decbin($value1),-16));
 		$request->param4 = $probeType;		
 		$this->sendRequest($request); 		
  	}
