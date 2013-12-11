@@ -668,7 +668,54 @@
             }
     return $info;
     }
- 
+     /**
+    * fonction permettant de l'historique d'une sonde
+    * Depuis internet
+    * Retourne les valeurs v1 et v2 du capteur spécifié
+    * ainsi que la date heure du relevé depuis un site zibase sur internet.
+    * Pour les sondes Oregon et TS10, il faut diviser v1 par 10.
+    * Ex: pour le THGR228N : v1 = température x 10 et v2 = % d'humidité
+	  * @param string idprincipalzibase = ZibaseID
+	  * @param string tokenzibase = Token Zibase
+	  * @param string sensor = ID de la sonde interrogee
+    */
+    public function getSensorHistoryFromInternet($idprincipalzibase,$tokenzibase,$sensor) {
+            $info = array();
+            $contenu=file_get_contents("http://zibase.net/m/temperature_csv.php?device=".$idprincipalzibase."&token=".$tokenzibase);
+            $contenu = str_replace("\n","|",$contenu);
+            $contenu = str_replace("\"","",$contenu);
+            $lignes=explode("|",$contenu);
+            $boucle=0;
+            $skip = 0;
+            while ($boucle < sizeof($lignes)) {
+               if($lignes[$boucle] == "Data registered during the two last days") {
+                    $type = "days";
+                    $skip = 2;
+                    $j = 0;
+                 } else if($lignes[$boucle] == "Data registered during the current month") {
+                    $type = "month";
+                    $skip = 2;
+                    $j = 0;
+                 } else if($lignes[$boucle] == "Data registered during the current year") {
+                    $type = "year";
+                    $skip = 2;
+                    $j = 0;
+                 }
+              if((!($skip >0)) && (!($lignes[$boucle] == ""))){
+                 $value = explode(";",$lignes[$boucle]);
+                 if($value[0] == $sensor) {
+                    $info[$type][$j][0] = $value[2];
+                    $info[$type][$j][1] = $value[3];
+                    $info[$type][$j][2] = $value[4];
+                    $j++;
+                 }
+              }
+              $boucle++;
+              $skip--;
+              }
+        }
+      return $info;
+      }
  }
  
 ?>
